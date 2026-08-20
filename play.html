@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BATCAVE // PLAY</title>
+  <link rel="icon" href="images/emblem.jpg">
+  <link rel="stylesheet" href="css/batcave.css">
+</head>
+<body>
+  <div class="bg"></div>
+  <header class="top">
+    <a class="brand" href="index.html">
+      <img src="images/emblem.jpg" alt="Batcave emblem">
+      <div>
+        <h1>BATCAVE</h1>
+        <small>MISSION ACTIVE</small>
+      </div>
+    </a>
+    <div class="search">
+      <input id="q" type="search" placeholder="Jump to another game..." autocomplete="off">
+    </div>
+  </header>
+
+  <main class="wrap play-shell">
+    <div class="play-bar">
+      <h2 id="title">Loading...</h2>
+      <div class="actions">
+        <a class="btn" href="index.html">Back to cave</a>
+        <a class="btn" id="school" target="_blank" rel="noopener">Play on school network</a>
+        <a class="btn solid" id="open" target="_blank" rel="noopener">Open full game</a>
+      </div>
+    </div>
+    <div class="stage">
+      <iframe id="frame" title="Game" allowfullscreen allow="autoplay; fullscreen; gamepad"></iframe>
+    </div>
+    <p class="note" id="note">If this stays black on a school computer, use <strong>Play on school network</strong>.</p>
+  </main>
+
+  <script src="js/games.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const id = params.get("g");
+    const game = (window.BATCAVE_GAMES || []).find(g => g.id === id);
+    const title = document.getElementById("title");
+    const frame = document.getElementById("frame");
+    const open = document.getElementById("open");
+    const school = document.getElementById("school");
+    const q = document.getElementById("q");
+
+    if (!game) {
+      title.textContent = "Signal lost";
+      open.href = "index.html";
+      open.textContent = "Return to cave";
+      school.href = "https://sites.google.com/view/classroom6x/";
+    } else {
+      document.title = "BATCAVE // " + game.title;
+      title.textContent = game.title;
+      frame.src = game.url;
+      open.href = game.url;
+      school.href = game.schoolUrl || "https://sites.google.com/view/classroom6x/";
+    }
+
+    q.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      const term = q.value.trim().toLowerCase();
+      const hit = (window.BATCAVE_GAMES || []).find(g => g.title.toLowerCase().includes(term) || g.id.includes(term.replace(/\s+/g, "-")));
+      if (hit) location.href = "play.html?g=" + encodeURIComponent(hit.id);
+    });
+  </script>
+</body>
+</html>
