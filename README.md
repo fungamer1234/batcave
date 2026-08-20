@@ -1,9 +1,11 @@
 # BATCAVE
 
-Batman-themed games terminal. Catalog sourced from classroom6x.
+Batman-themed games terminal.
 
 **Live:** https://fungamer1234.github.io/batcave/
 
-Leave **School** on at school. Titles tagged SCHOOL open on Google Sites pages that usually load on school networks.
+Play sources:
+- [UGS files](https://github.com/brickyosu/ugs-files-sorted) first
+- classroom6x pages for titles not in that stash
 
-Unofficial fan site. Games belong to their original owners. Follow school rules. Homework first.
+Leave **School** on at school. Unofficial fan site. Follow school rules. Homework first.

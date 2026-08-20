@@ -32,13 +32,14 @@
       </div>
     </div>
     <div class="stage">
-      <iframe id="frame" title="Game" allowfullscreen allow="autoplay; fullscreen; gamepad"></iframe>
+      <iframe id="frame" title="Game" allowfullscreen allow="autoplay; fullscreen; gamepad; pointer-lock" sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups allow-forms allow-modals"></iframe>
     </div>
-    <p class="note" id="note">If this stays black on a school computer, use <strong>Play on school network</strong>.</p>
+    <p class="note" id="note">UGS games load from the public GitHub stash. If the screen stays black, use the buttons above.</p>
   </main>
 
   <script src="js/games.js"></script>
   <script>
+    const CDN = "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/";
     const params = new URLSearchParams(location.search);
     const id = params.get("g");
     const game = (window.BATCAVE_GAMES || []).find(g => g.id === id);
@@ -46,7 +47,43 @@
     const frame = document.getElementById("frame");
     const open = document.getElementById("open");
     const school = document.getElementById("school");
+    const note = document.getElementById("note");
     const q = document.getElementById("q");
+
+    function fileUrl(file) {
+      return CDN + file.split("/").map(encodeURIComponent).join("/");
+    }
+
+    async function play(game) {
+      document.title = "BATCAVE // " + game.title;
+      title.textContent = game.title;
+      school.href = game.schoolUrl || "https://sites.google.com/view/classroom6x/";
+
+      if (game.file) {
+        const url = fileUrl(game.file);
+        open.href = url;
+        note.textContent = "Loading UGS file: " + game.file;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("fetch " + res.status);
+          const html = await res.text();
+          const blob = new Blob([html], { type: "text/html" });
+          frame.src = URL.createObjectURL(blob);
+          note.textContent = "Playing from UGS stash. If it stays black, open the full game.";
+        } catch (err) {
+          note.textContent = "UGS file blocked here. Opening classroom6x instead.";
+          frame.removeAttribute("sandbox");
+          frame.src = game.school && game.schoolUrl ? game.schoolUrl : game.url;
+          open.href = game.url;
+        }
+        return;
+      }
+
+      open.href = game.url;
+      frame.removeAttribute("sandbox");
+      frame.src = game.url;
+      note.textContent = "This title is not in the UGS stash. Opening classroom6x.";
+    }
 
     if (!game) {
       title.textContent = "Signal lost";
@@ -54,11 +91,7 @@
       open.textContent = "Return to cave";
       school.href = "https://sites.google.com/view/classroom6x/";
     } else {
-      document.title = "BATCAVE // " + game.title;
-      title.textContent = game.title;
-      frame.src = game.url;
-      open.href = game.url;
-      school.href = game.schoolUrl || "https://sites.google.com/view/classroom6x/";
+      play(game);
     }
 
     q.addEventListener("keydown", (e) => {

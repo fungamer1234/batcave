@@ -22,6 +22,7 @@
 
   const categories = [
     ["all", "All"],
+    ["ugs", "UGS Files"],
     ["school", "School"],
     ["featured", "Featured"],
     ["action", "Action"],
@@ -75,15 +76,26 @@
     const schoolOn = schoolMode ? schoolMode.checked : true;
     grid.innerHTML = list.map((g) => {
       const featured = (g.cats || []).includes("featured");
-      const href = schoolOn && g.school
-        ? g.schoolUrl
-        : "play.html?g=" + encodeURIComponent(g.id);
-      const tag = g.school ? `<span class="tag">SCHOOL</span>` : (featured ? `<span class="tag">SIGNAL</span>` : "");
+      const hasFile = !!g.file;
+      let href = "play.html?g=" + encodeURIComponent(g.id);
+      let extra = "";
+      if (schoolOn && !hasFile && g.school) {
+        href = g.schoolUrl;
+        extra = ' target="_blank" rel="noopener"';
+      }
+      const tag = hasFile
+        ? `<span class="tag">UGS</span>`
+        : g.school
+          ? `<span class="tag">SCHOOL</span>`
+          : featured ? `<span class="tag">SIGNAL</span>` : "";
+      const thumb = g.thumb
+        ? `<img src="${g.thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : "";
       return `
-        <a class="card" href="${href}" ${schoolOn && g.school ? 'target="_blank" rel="noopener"' : ""}>
+        <a class="card" href="${href}"${extra}>
           <div class="thumb">
             <span class="fallback">${initials(g.title)}</span>
-            <img src="${g.thumb}" alt="" loading="lazy" onerror="this.style.display='none'">
+            ${thumb}
             ${tag}
           </div>
           <h3>${g.title}</h3>
